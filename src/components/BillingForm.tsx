@@ -116,10 +116,20 @@ const BillingForm: React.FC<BillingFormProps> = ({ onFormSubmit }) => {
       return;
     }
 
+    // Fix 1: Ensure all required properties are included and not optional for BillData
     const billData: BillData = {
-      ...data,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      contactNumber: data.contactNumber,
+      email: data.email,
+      customerId: data.customerId,
       bookingDate,
       checkInDate,
+      hotelName: data.hotelName || '',
+      roomNumber: data.roomNumber || '',
+      travelSecurity: data.travelSecurity,
+      advancedAmount: data.advancedAmount,
+      serviceCharge: data.serviceCharge,
       dueAmount,
       totalCost,
       services
@@ -233,10 +243,11 @@ const BillingForm: React.FC<BillingFormProps> = ({ onFormSubmit }) => {
                 <div>
                   <Label htmlFor="bookingDate">Booking Date</Label>
                   <div className="relative">
+                    {/* Fix 2: Correct DatePicker onChange type */}
                     <DatePicker
                       id="bookingDate"
                       selected={bookingDate}
-                      onChange={(date) => setBookingDate(date)}
+                      onChange={(date: Date | null) => setBookingDate(date)}
                       className="glass-input w-full pl-10"
                       dateFormat="dd/MM/yyyy"
                     />
@@ -257,10 +268,11 @@ const BillingForm: React.FC<BillingFormProps> = ({ onFormSubmit }) => {
               <div>
                 <Label htmlFor="checkInDate">Check-in Date</Label>
                 <div className="relative">
+                  {/* Fix 3: Correct DatePicker onChange type */}
                   <DatePicker
                     id="checkInDate"
                     selected={checkInDate}
-                    onChange={(date) => setCheckInDate(date)}
+                    onChange={(date: Date | null) => setCheckInDate(date)}
                     className="glass-input w-full pl-10"
                     dateFormat="dd/MM/yyyy"
                     placeholderText="Select check-in date"
