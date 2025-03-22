@@ -69,12 +69,16 @@ export const generatePDF = (billData: BillData) => {
   doc.setFont("helvetica", "bold");
   doc.text("SERVICES", 15, 110);
 
-  // Create the services table with adjusted column widths
+  // Create the services table with better adjusted column widths
   const tableData = billData.services.map(service => [
     service.name,
     service.details,
     formatCurrency(service.amount)
   ]);
+
+  // Calculate available page width
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const tableWidth = pageWidth - 30; // 15px margin on each side
 
   autoTable(doc, {
     startY: 115,
@@ -88,12 +92,13 @@ export const generatePDF = (billData: BillData) => {
     },
     styles: {
       fontSize: 9,
-      cellPadding: 3
+      cellPadding: 3,
+      overflow: 'linebreak' // Handle overflow with line breaks
     },
     columnStyles: {
-      0: { cellWidth: 50 },  // Reduced width of Service column
-      1: { cellWidth: 85 },  // Increased width of Details column
-      2: { cellWidth: 30, halign: 'right' }  // Adjusted Amount column width
+      0: { cellWidth: tableWidth * 0.30 }, // 30% of table width for Service
+      1: { cellWidth: tableWidth * 0.50 }, // 50% of table width for Details
+      2: { cellWidth: tableWidth * 0.20, halign: 'right' } // 20% of table width for Amount
     },
     margin: { left: 15, right: 15 }
   });
@@ -101,7 +106,7 @@ export const generatePDF = (billData: BillData) => {
   // Get the last Y position after the table
   const finalY = (doc as any).lastAutoTable.finalY + 10;
 
-  // Create a styled box for payment summary
+  // Create an improved styled box for payment summary with more spacing
   const paymentSummaryX = doc.internal.pageSize.getWidth() - 90;
   const paymentSummaryWidth = 75;
   
@@ -109,9 +114,9 @@ export const generatePDF = (billData: BillData) => {
   doc.setFillColor(248, 250, 252);  // Light gray background
   doc.roundedRect(
     paymentSummaryX, 
-    finalY - 5, 
+    finalY, 
     paymentSummaryWidth, 
-    48, 
+    55, 
     2, 
     2, 
     'F'
@@ -121,9 +126,9 @@ export const generatePDF = (billData: BillData) => {
   doc.setDrawColor(226, 232, 240);
   doc.roundedRect(
     paymentSummaryX, 
-    finalY - 5, 
+    finalY, 
     paymentSummaryWidth, 
-    48, 
+    55, 
     2, 
     2, 
     'S'
@@ -132,31 +137,31 @@ export const generatePDF = (billData: BillData) => {
   // Payment Information Title
   doc.setFont("helvetica", "bold");
   doc.setTextColor(50, 50, 50);
-  doc.text("PAYMENT SUMMARY", paymentSummaryX + paymentSummaryWidth/2, finalY, { align: "center" });
+  doc.text("PAYMENT SUMMARY", paymentSummaryX + paymentSummaryWidth/2, finalY + 8, { align: "center" });
   
-  // Payment items
+  // Payment items - increased vertical spacing between items
   doc.setFont("helvetica", "normal");
   doc.setTextColor(70, 70, 70);
   
-  doc.text("Service Charge:", paymentSummaryX + 5, finalY + 10);
-  doc.text(formatCurrency(billData.serviceCharge), paymentSummaryX + paymentSummaryWidth - 5, finalY + 10, { align: "right" });
+  doc.text("Service Charge:", paymentSummaryX + 5, finalY + 18);
+  doc.text(formatCurrency(billData.serviceCharge), paymentSummaryX + paymentSummaryWidth - 5, finalY + 18, { align: "right" });
   
-  doc.text("Advanced Amount:", paymentSummaryX + 5, finalY + 18);
-  doc.text(formatCurrency(billData.advancedAmount), paymentSummaryX + paymentSummaryWidth - 5, finalY + 18, { align: "right" });
+  doc.text("Advanced Amount:", paymentSummaryX + 5, finalY + 28);
+  doc.text(formatCurrency(billData.advancedAmount), paymentSummaryX + paymentSummaryWidth - 5, finalY + 28, { align: "right" });
   
-  doc.text("Due Amount:", paymentSummaryX + 5, finalY + 26);
-  doc.text(formatCurrency(billData.dueAmount), paymentSummaryX + paymentSummaryWidth - 5, finalY + 26, { align: "right" });
+  doc.text("Due Amount:", paymentSummaryX + 5, finalY + 38);
+  doc.text(formatCurrency(billData.dueAmount), paymentSummaryX + paymentSummaryWidth - 5, finalY + 38, { align: "right" });
   
   // Draw a line for total
   doc.setDrawColor(14, 165, 233); // travel-500 color
   doc.setLineWidth(0.5);
-  doc.line(paymentSummaryX + 5, finalY + 30, paymentSummaryX + paymentSummaryWidth - 5, finalY + 30);
+  doc.line(paymentSummaryX + 5, finalY + 42, paymentSummaryX + paymentSummaryWidth - 5, finalY + 42);
   
   // Total cost
   doc.setFont("helvetica", "bold");
   doc.setTextColor(14, 165, 233); // travel-500 color
-  doc.text("TOTAL COST:", paymentSummaryX + 5, finalY + 38);
-  doc.text(formatCurrency(billData.totalCost), paymentSummaryX + paymentSummaryWidth - 5, finalY + 38, { align: "right" });
+  doc.text("TOTAL COST:", paymentSummaryX + 5, finalY + 50);
+  doc.text(formatCurrency(billData.totalCost), paymentSummaryX + paymentSummaryWidth - 5, finalY + 50, { align: "right" });
   
   // Add footer
   const footerY = doc.internal.pageSize.getHeight() - 20;
