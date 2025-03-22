@@ -39,6 +39,7 @@ type FormValues = z.infer<typeof formSchema>;
 const BillingForm: React.FC<BillingFormProps> = ({ onFormSubmit }) => {
   const [bookingDate, setBookingDate] = useState<Date | null>(new Date());
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
+  const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
   const [services, setServices] = useState<Service[]>([
     { id: crypto.randomUUID(), name: '', details: '', amount: 0 }
   ]);
@@ -111,6 +112,11 @@ const BillingForm: React.FC<BillingFormProps> = ({ onFormSubmit }) => {
       return;
     }
 
+    if (!checkOutDate) {
+      toast.error("Check-out date is required");
+      return;
+    }
+
     if (services.some(service => !service.name)) {
       toast.error("All service names are required");
       return;
@@ -125,6 +131,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ onFormSubmit }) => {
       customerId: data.customerId,
       bookingDate,
       checkInDate,
+      checkOutDate,
       hotelName: data.hotelName || '',
       roomNumber: data.roomNumber || '',
       travelSecurity: data.travelSecurity,
@@ -235,7 +242,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ onFormSubmit }) => {
                   <Input
                     id="customerId"
                     className="glass-input bg-gray-50"
-                    readOnly
                     {...register('customerId')}
                   />
                 </div>
@@ -283,23 +289,26 @@ const BillingForm: React.FC<BillingFormProps> = ({ onFormSubmit }) => {
               </div>
               
               <div>
-                <Label htmlFor="hotelName">Hotel Name</Label>
+                <Label htmlFor="hotelName">Trip Name</Label>
                 <Input
                   id="hotelName"
                   className="glass-input"
-                  placeholder="Enter hotel name"
+                  placeholder="Enter trip name"
                   {...register('hotelName')}
                 />
               </div>
               
               <div>
-                <Label htmlFor="roomNumber">Room Number</Label>
-                <Input
-                  id="roomNumber"
-                  className="glass-input"
-                  placeholder="Enter room number"
-                  {...register('roomNumber')}
-                />
+                <Label htmlFor="check-out-date">Check-out Date</Label>
+                <DatePicker
+                    id="checkOutDate"
+                    selected={checkOutDate}
+                    onChange={(date: Date | null) => setCheckOutDate(date)}
+                    className="glass-input w-full pl-10"
+                    dateFormat="dd MMM yyyy"
+                    placeholderText="Select check-out date"
+                    minDate={new Date()}
+                  />
               </div>
               
               <div className="flex items-center space-x-2 pt-8">

@@ -22,9 +22,9 @@ export function formatDate(date: Date | string | null): string {
 }
 
 export function generateCustomerId(): string {
-  const prefix = "TRIP";
-  const randomDigits = Math.floor(100000 + Math.random() * 900000);
-  return `${prefix}${randomDigits}`;
+  const prefix = "";
+  // const randomDigits = Math.floor(100000 + Math.random() * 900000);
+  return `${prefix}`;
 }
 
 export const debounce = <F extends (...args: any[]) => any>(
@@ -69,6 +69,7 @@ export interface BillData {
   customerId: string;
   bookingDate: Date | null;
   checkInDate: Date | null;
+  checkOutDate: Date | null;
   hotelName: string;
   roomNumber: string;
   travelSecurity: boolean;
@@ -87,6 +88,7 @@ export const initialBillData: BillData = {
   customerId: generateCustomerId(),
   bookingDate: new Date(),
   checkInDate: null,
+  checkOutDate: null,
   hotelName: "",
   roomNumber: "",
   travelSecurity: false,

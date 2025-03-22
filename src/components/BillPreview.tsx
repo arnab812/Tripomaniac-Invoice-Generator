@@ -61,16 +61,18 @@ const BillPreview: React.FC<BillPreviewProps> = ({ billData }) => {
               <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 mb-1">Customer Details</h3>
+                    <h3 className="text-sm font-medium text-gray-500 mb-1"><u>Customer Details</u></h3>
                     <p className="text-lg font-semibold mb-1">{billData.firstName} {billData.lastName}</p>
                     <p className="text-sm text-gray-600 mb-1">{billData.contactNumber}</p>
                     <p className="text-sm text-gray-600">{billData.email}</p>
+                    <p className="text-sm text-gray-600 mb-1">Travel Security: {billData.travelSecurity ? "Yes" : "No"}</p>
                   </div>
                   <div className="text-right">
-                    <h3 className="text-sm font-medium text-gray-500 mb-1">Invoice Information</h3>
+                    <h3 className="text-sm font-medium text-gray-500 mb-1"><u>Invoice Information</u></h3>
                     <p className="text-lg font-semibold mb-1">{billData.customerId}</p>
                     <p className="text-sm text-gray-600 mb-1">Booking: {formatDate(billData.bookingDate)}</p>
                     <p className="text-sm text-gray-600">Check-in: {formatDate(billData.checkInDate)}</p>
+                    <p className="text-sm text-gray-600">Check-out: {formatDate(billData.checkOutDate)}</p>
                   </div>
                 </div>
               </div>
@@ -79,12 +81,16 @@ const BillPreview: React.FC<BillPreviewProps> = ({ billData }) => {
                 <h3 className="text-sm font-medium text-gray-500 mb-3">Accommodation</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Hotel</p>
+                    <p className="text-sm text-gray-500 mb-1">Trip Name</p>
                     <p className="font-medium">{billData.hotelName || "Not specified"}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Room Number</p>
-                    <p className="font-medium">{billData.roomNumber || "Not specified"}</p>
+                    <p className="text-sm text-gray-500 mb-1">Details</p>
+                    <p className="font-medium">{billData.services[0]?.details || "Not specified"}</p>
+                    <p className="font-medium">{billData.services[1]?.details || ""}</p>
+                    <p className="font-medium">{billData.services[2]?.details || ""}</p>
+                    <p className="font-medium">{billData.services[3]?.details || ""}</p>
+                    <p className="font-medium">{billData.services[4]?.details || ""}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Travel Security</p>

@@ -52,30 +52,31 @@ export const generatePDF = (billData: BillData) => {
   doc.text(`Name: ${billData.firstName} ${billData.lastName}`, 15, 58);
   doc.text(`Contact: ${billData.contactNumber}`, 15, 64);
   doc.text(`Email: ${billData.email}`, 15, 70);
-  
+  doc.text(`Travel Security: ${billData.travelSecurity ? "Yes" : "No"}`, 15, 76);
+
   // Right column
   doc.text(`Customer ID: ${billData.customerId}`, doc.internal.pageSize.getWidth() - 85, 58);
   doc.text(`Booking Date: ${formatDate(billData.bookingDate)}`, doc.internal.pageSize.getWidth() - 85, 64);
   doc.text(`Check-in Date: ${formatDate(billData.checkInDate)}`, doc.internal.pageSize.getWidth() - 85, 70);
+  doc.text(`Check-out Date: ${formatDate(billData.checkOutDate)}`, doc.internal.pageSize.getWidth() - 85, 76);
 
   // Hotel information
   doc.setFont("helvetica", "bold");
-  doc.text("ACCOMMODATION DETAILS", 15, 80);
+  // doc.text("ACCOMMODATION DETAILS", 15, 80);
   
   doc.setFont("helvetica", "normal");
-  doc.text(`Hotel: ${billData.hotelName}`, 15, 88);
-  doc.text(`Room: ${billData.roomNumber}`, 15, 94);
-  doc.text(`Travel Security: ${billData.travelSecurity ? "Yes" : "No"}`, 15, 100);
+  // doc.text(`Check-out Date: ${billData.checkOutDate}`, 15, 88);
+  // doc.text(`Room: ${billData.roomNumber}`, 15, 94);
+  // doc.text(`Travel Security: ${billData.travelSecurity ? "Yes" : "No"}`, 15, 100);
 
   // Services Table
   doc.setFont("helvetica", "bold");
-  doc.text("SERVICES", 15, 110);
+  doc.text("SERVICES", 15, 90);
 
   // Create the services table with better adjusted column widths
   const tableData = billData.services.map(service => [
     service.name,
-    service.details,
-    formatCurrency(service.amount)
+    service.details
   ]);
 
   // Calculate available page width
@@ -83,8 +84,8 @@ export const generatePDF = (billData: BillData) => {
   const tableWidth = pageWidth - 30; // 15px margin on each side
 
   autoTable(doc, {
-    startY: 115,
-    head: [['Service', 'Details', 'Amount']],
+    startY: 95,
+    head: [['Service', 'Details']],
     body: tableData,
     theme: 'grid',
     headStyles: { 
@@ -99,8 +100,7 @@ export const generatePDF = (billData: BillData) => {
     },
     columnStyles: {
       0: { cellWidth: tableWidth * 0.30 }, // 30% of table width for Service
-      1: { cellWidth: tableWidth * 0.50 }, // 50% of table width for Details
-      2: { cellWidth: tableWidth * 0.20, halign: 'left' } // 20% of table width for Amount
+      1: { cellWidth: tableWidth * 0.70 }, // 50% of table width for Details
     },
     margin: { left: 15, right: 15 }
   });
@@ -177,5 +177,6 @@ export const generatePDF = (billData: BillData) => {
   // doc.text("This is a computer generated invoice and does not require signature.", doc.internal.pageSize.getWidth() / 2, footerY + 5, { align: "center" });
 
   // Save the PDF
-  doc.save(`Tripomaniac_Invoice_for_${billData.firstName}_${billData.lastName}_${new Date().toISOString()}.pdf`);
+  // doc.save(`Tripomaniac_Invoice_for_${billData.firstName}_${billData.lastName}_${new Date().toISOString()}.pdf`);
+  doc.save(`Tripomaniac Invoice for ${billData.firstName} ${billData.lastName}.pdf`);
 };
