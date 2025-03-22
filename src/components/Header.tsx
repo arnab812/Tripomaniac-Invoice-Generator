@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import logo from '../assets/logo.svg';
+import logo from '../assets/logo.png';
 
 const Header: React.FC = () => {
   return (

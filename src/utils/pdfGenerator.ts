@@ -2,6 +2,8 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { BillData, formatCurrency, formatDate } from "@/lib/utils";
+import { AnyARecord } from "dns";
+// import logo from '@/assets/logo.png';
 
 export const generatePDF = (billData: BillData) => {
   // Create a new PDF document
@@ -9,7 +11,7 @@ export const generatePDF = (billData: BillData) => {
   
   // Set document properties
   doc.setProperties({
-    title: `Tripomaniac_Invoice_${billData.customerId}`,
+    title: `Tripomaniac_Invoice_${billData.firstName}_${billData.lastName}`,
     subject: 'Travel Invoice',
     author: 'Tripomaniac Travel Agency',
     creator: 'Tripomaniac Billing Software'
@@ -98,13 +100,14 @@ export const generatePDF = (billData: BillData) => {
     columnStyles: {
       0: { cellWidth: tableWidth * 0.30 }, // 30% of table width for Service
       1: { cellWidth: tableWidth * 0.50 }, // 50% of table width for Details
-      2: { cellWidth: tableWidth * 0.20, halign: 'right' } // 20% of table width for Amount
+      2: { cellWidth: tableWidth * 0.20, halign: 'left' } // 20% of table width for Amount
     },
     margin: { left: 15, right: 15 }
   });
 
   // Get the last Y position after the table
-  const finalY = (doc as any).lastAutoTable.finalY + 10;
+  // const finalY = (doc as any).lastAutoTable.finalY + 10;
+  const finalY = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
 
   // Create an improved styled box for payment summary with more spacing
   const paymentSummaryX = doc.internal.pageSize.getWidth() - 90;
@@ -142,26 +145,28 @@ export const generatePDF = (billData: BillData) => {
   // Payment items - increased vertical spacing between items
   doc.setFont("helvetica", "normal");
   doc.setTextColor(70, 70, 70);
-  
-  doc.text("Service Charge:", paymentSummaryX + 5, finalY + 18);
-  doc.text(formatCurrency(billData.serviceCharge), paymentSummaryX + paymentSummaryWidth - 5, finalY + 18, { align: "right" });
-  
-  doc.text("Advanced Amount:", paymentSummaryX + 5, finalY + 28);
-  doc.text(formatCurrency(billData.advancedAmount), paymentSummaryX + paymentSummaryWidth - 5, finalY + 28, { align: "right" });
-  
-  doc.text("Due Amount:", paymentSummaryX + 5, finalY + 38);
-  doc.text(formatCurrency(billData.dueAmount), paymentSummaryX + paymentSummaryWidth - 5, finalY + 38, { align: "right" });
-  
+
+  const textOffsetX = 10; // Adjust this value to shift the text to the left
+
+  doc.text("Service Charge:", paymentSummaryX + textOffsetX, finalY + 18);
+  doc.text(formatCurrency(billData.serviceCharge), paymentSummaryX + paymentSummaryWidth - textOffsetX, finalY + 18, { align: "right" });
+
+  doc.text("Advanced Amount:", paymentSummaryX + textOffsetX, finalY + 28);
+  doc.text(formatCurrency(billData.advancedAmount), paymentSummaryX + paymentSummaryWidth - textOffsetX, finalY + 28, { align: "right" });
+
+  doc.text("Due Amount:", paymentSummaryX + textOffsetX, finalY + 38);
+  doc.text(formatCurrency(billData.dueAmount), paymentSummaryX + paymentSummaryWidth - textOffsetX, finalY + 38, { align: "right" });
+
   // Draw a line for total
   doc.setDrawColor(14, 165, 233); // travel-500 color
   doc.setLineWidth(0.5);
-  doc.line(paymentSummaryX + 5, finalY + 42, paymentSummaryX + paymentSummaryWidth - 5, finalY + 42);
-  
+  doc.line(paymentSummaryX + textOffsetX, finalY + 42, paymentSummaryX + paymentSummaryWidth - textOffsetX, finalY + 42);
+
   // Total cost
   doc.setFont("helvetica", "bold");
   doc.setTextColor(14, 165, 233); // travel-500 color
-  doc.text("TOTAL COST:", paymentSummaryX + 5, finalY + 50);
-  doc.text(formatCurrency(billData.totalCost), paymentSummaryX + paymentSummaryWidth - 5, finalY + 50, { align: "right" });
+  doc.text("TOTAL COST:", paymentSummaryX + textOffsetX, finalY + 50);
+  doc.text(formatCurrency(billData.totalCost), paymentSummaryX + paymentSummaryWidth - textOffsetX, finalY + 50, { align: "right" });
   
   // Add footer
   const footerY = doc.internal.pageSize.getHeight() - 20;
@@ -169,8 +174,8 @@ export const generatePDF = (billData: BillData) => {
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
   doc.text("Thank you for choosing Tripomaniac for your travel needs.", doc.internal.pageSize.getWidth() / 2, footerY, { align: "center" });
-  doc.text("This is a computer generated invoice and does not require signature.", doc.internal.pageSize.getWidth() / 2, footerY + 5, { align: "center" });
+  // doc.text("This is a computer generated invoice and does not require signature.", doc.internal.pageSize.getWidth() / 2, footerY + 5, { align: "center" });
 
   // Save the PDF
-  doc.save(`Tripomaniac_Invoice_${billData.customerId}.pdf`);
+  doc.save(`Tripomaniac_Invoice_for_${billData.firstName}_${billData.lastName}_${new Date().toISOString()}.pdf`);
 };

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Printer } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { generatePDF } from '@/utils/pdfGenerator';
-import logo from '../assets/logo.svg';
+import logo from '../assets/logo.png';
 
 interface BillPreviewProps {
   billData: BillData;
