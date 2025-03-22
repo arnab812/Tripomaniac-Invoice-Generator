@@ -69,7 +69,7 @@ export const generatePDF = (billData: BillData) => {
   doc.setFont("helvetica", "bold");
   doc.text("SERVICES", 15, 110);
 
-  // Create the services table
+  // Create the services table with adjusted column widths
   const tableData = billData.services.map(service => [
     service.name,
     service.details,
@@ -87,42 +87,76 @@ export const generatePDF = (billData: BillData) => {
       fontStyle: 'bold'
     },
     styles: {
-      fontSize: 9
+      fontSize: 9,
+      cellPadding: 3
     },
     columnStyles: {
-      0: { cellWidth: 60 },
-      1: { cellWidth: 80 },
-      2: { cellWidth: 40, halign: 'right' }
-    }
+      0: { cellWidth: 50 },  // Reduced width of Service column
+      1: { cellWidth: 85 },  // Increased width of Details column
+      2: { cellWidth: 30, halign: 'right' }  // Adjusted Amount column width
+    },
+    margin: { left: 15, right: 15 }
   });
 
   // Get the last Y position after the table
   const finalY = (doc as any).lastAutoTable.finalY + 10;
 
-  // Payment Information
+  // Create a styled box for payment summary
+  const paymentSummaryX = doc.internal.pageSize.getWidth() - 90;
+  const paymentSummaryWidth = 75;
+  
+  // Background for payment summary
+  doc.setFillColor(248, 250, 252);  // Light gray background
+  doc.roundedRect(
+    paymentSummaryX, 
+    finalY - 5, 
+    paymentSummaryWidth, 
+    48, 
+    2, 
+    2, 
+    'F'
+  );
+  
+  // Border for payment summary
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(
+    paymentSummaryX, 
+    finalY - 5, 
+    paymentSummaryWidth, 
+    48, 
+    2, 
+    2, 
+    'S'
+  );
+
+  // Payment Information Title
   doc.setFont("helvetica", "bold");
-  doc.text("PAYMENT SUMMARY", doc.internal.pageSize.getWidth() - 75, finalY);
+  doc.setTextColor(50, 50, 50);
+  doc.text("PAYMENT SUMMARY", paymentSummaryX + paymentSummaryWidth/2, finalY, { align: "center" });
   
+  // Payment items
   doc.setFont("helvetica", "normal");
-  doc.text("Service Charge:", doc.internal.pageSize.getWidth() - 75, finalY + 8);
-  doc.text(formatCurrency(billData.serviceCharge), doc.internal.pageSize.getWidth() - 15, finalY + 8, { align: "right" });
+  doc.setTextColor(70, 70, 70);
   
-  doc.text("Advanced Amount:", doc.internal.pageSize.getWidth() - 75, finalY + 14);
-  doc.text(formatCurrency(billData.advancedAmount), doc.internal.pageSize.getWidth() - 15, finalY + 14, { align: "right" });
+  doc.text("Service Charge:", paymentSummaryX + 5, finalY + 10);
+  doc.text(formatCurrency(billData.serviceCharge), paymentSummaryX + paymentSummaryWidth - 5, finalY + 10, { align: "right" });
   
-  doc.text("Due Amount:", doc.internal.pageSize.getWidth() - 75, finalY + 20);
-  doc.text(formatCurrency(billData.dueAmount), doc.internal.pageSize.getWidth() - 15, finalY + 20, { align: "right" });
+  doc.text("Advanced Amount:", paymentSummaryX + 5, finalY + 18);
+  doc.text(formatCurrency(billData.advancedAmount), paymentSummaryX + paymentSummaryWidth - 5, finalY + 18, { align: "right" });
+  
+  doc.text("Due Amount:", paymentSummaryX + 5, finalY + 26);
+  doc.text(formatCurrency(billData.dueAmount), paymentSummaryX + paymentSummaryWidth - 5, finalY + 26, { align: "right" });
   
   // Draw a line for total
   doc.setDrawColor(14, 165, 233); // travel-500 color
   doc.setLineWidth(0.5);
-  doc.line(doc.internal.pageSize.getWidth() - 75, finalY + 24, doc.internal.pageSize.getWidth() - 15, finalY + 24);
+  doc.line(paymentSummaryX + 5, finalY + 30, paymentSummaryX + paymentSummaryWidth - 5, finalY + 30);
   
   // Total cost
   doc.setFont("helvetica", "bold");
   doc.setTextColor(14, 165, 233); // travel-500 color
-  doc.text("TOTAL COST:", doc.internal.pageSize.getWidth() - 75, finalY + 30);
-  doc.text(formatCurrency(billData.totalCost), doc.internal.pageSize.getWidth() - 15, finalY + 30, { align: "right" });
+  doc.text("TOTAL COST:", paymentSummaryX + 5, finalY + 38);
+  doc.text(formatCurrency(billData.totalCost), paymentSummaryX + paymentSummaryWidth - 5, finalY + 38, { align: "right" });
   
   // Add footer
   const footerY = doc.internal.pageSize.getHeight() - 20;
